@@ -1,7 +1,8 @@
+import dotenv from "dotenv"
+dotenv.config()
 import app from "./app.js";
-import{PORT} from "./variables.js"
 
 
 
-app.listen(PORT);
+app.listen(process.env.PORT);
 console.log("contectado");

@@ -1,18 +1,13 @@
 import mysql from "promise-mysql"
-import {
-    DB_HOST,
-    DB_NAME,
-    DB_USER,
-    DB_PASSWORD,
-    DB_PORT,
-} from "../variables.js"
+import dotenv from "dotenv"
+dotenv.config()
 
 const connection = mysql.createConnection({
-    user: DB_USER,
-    password:DB_PASSWORD,
-    host: DB_HOST,
-    port: DB_PORT,
-    database: DB_NAME
+    user: process.env.DB_USER,
+    password:process.env.DB_PASSWORD,
+    host:process.env.DB_HOST,
+    port:process.env.DB_PORT,
+    database:process.env.DB_NAME
 });
 
 
