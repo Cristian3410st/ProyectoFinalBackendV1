@@ -52,9 +52,11 @@ export const register = async (req, res) => {
       
 
 export const login = async (req, res) => {
+
+  const connection = await getconnection();
   const { email, password } = req.body;
   const findQuery = "SELECT * FROM usuarios WHERE correoCorporativo = ?";
-  const connection = await getconnection();
+
 
   try {
       const [emailExist] = await connection.query(findQuery, [email]);
@@ -86,7 +88,9 @@ export const login = async (req, res) => {
   } catch (error) {
       console.error("Error al buscar el usuario:", error);
       return res.status(500).json({ status: "error", message: "Error en la consulta SQL", error });
-  } 
+  } finally{
+    connection.end();
+  }
 };
 
 
