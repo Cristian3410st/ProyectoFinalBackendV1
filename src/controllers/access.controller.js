@@ -89,7 +89,7 @@ export const login = async (req, res) => {
       console.error("Error al buscar el usuario:", error);
       return res.status(500).json({ status: "error", message: "Error en la consulta SQL", error });
   } finally{
-    connection.end();
+    
   }
 };
 
