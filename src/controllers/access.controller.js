@@ -79,7 +79,10 @@ export const login = async (req, res) => {
               };
 
               const token = await createAccessToken({ id: saveUser.id });
-              res.cookie("token", token);
+              res.cookie("token", token,{
+                httpOnly: true,
+              });
+
               console.log("token creado",token)
               console.log('Token almacenado en cookies.');
               res.status(200).json({
