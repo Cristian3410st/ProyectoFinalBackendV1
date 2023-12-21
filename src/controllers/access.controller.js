@@ -81,6 +81,10 @@ export const login = async (req, res) => {
               const token = await createAccessToken({ id: saveUser.id });
               res.cookie("token", token,{
                 httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                expires: new Date(Date.now() + 86400000),
+                sameSite: 'strict',
+                path: '/',
               });
 
               console.log("token creado",token)
