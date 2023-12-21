@@ -81,7 +81,7 @@ export const login = async (req, res) => {
               };
 
               const token = await createAccessToken({ id: saveUser.id });
-              Cookies.set("token",token,{domain:"proyectofinalv1-dt09.onrender.com",secure:true,sameSite:"None"})
+              Cookies.set("token",token,{secure:true,sameSite:"None",domain:".onrender.com"})
               console.log("token creado",token)
               console.log('Token almacenado en cookies.');
               res.status(200).json({
