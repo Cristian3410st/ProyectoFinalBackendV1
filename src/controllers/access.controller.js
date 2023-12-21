@@ -38,6 +38,8 @@ export const register = async (req, res) => {
         console.log(resUser)
         const token =  await createAccessToken({ id:resUser.id })
           res.cookie("token",token);
+          console.log("token creado",token)
+          console.log('Token almacenado en cookies.');
           res.status(200).json({
           id:resUser.id,
          username:resUser.username,
@@ -78,6 +80,8 @@ export const login = async (req, res) => {
 
               const token = await createAccessToken({ id: saveUser.id });
               res.cookie("token", token);
+              console.log("token creado",token)
+              console.log('Token almacenado en cookies.');
               res.status(200).json({
                   id: saveUser.id,
                   username: saveUser.username,
@@ -119,8 +123,9 @@ export const profile = async (req,res)=>{
 export const verifyToken = async (req, res) => {
   try {
     const { token } = req.cookies;
+    console.log('Token recibido:', token);
     if (!token) return res.send(false);
-
+    console.log('Inicio de la verificación del token');
     const user = jwt.verify(token, TOKEN_SECRET);
     const connection = await getconnection();
     const finduser = "SELECT * FROM usuarios WHERE id = ?";
