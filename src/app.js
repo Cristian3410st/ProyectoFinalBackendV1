@@ -9,7 +9,7 @@ import adminRoutes from "./routes/admin.routes.js"
 const app = exprees();
 
 app.use(cors({
-    origin: ["https://cristian3410st.github.io", "http://localhost:5173"],
+    origin: ["proyecto-final-frontend-v1.vercel.app", "http://localhost:5173"],
 
 
     credentials:true
