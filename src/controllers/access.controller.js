@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
 dotenv.config()
 const TOKEN_SECRET = process.env.TOKEN_SECRET;
-import Cookies from "js-cookie"
+
 
 
 
@@ -39,7 +39,7 @@ export const register = async (req, res) => {
         const resUser = {id:idResult.insertId,username,email};
         console.log(resUser)
         const token =  await createAccessToken({ id:resUser.id })
-          Cookies.set("token",token);
+          res.cookie("token",token)
           console.log("token creado",token)
           console.log('Token almacenado en cookies.');
           res.status(200).json({
@@ -81,7 +81,7 @@ export const login = async (req, res) => {
               };
 
               const token = await createAccessToken({ id: saveUser.id });
-              Cookies.set("token",token)
+              res.cookie("token",token)
               console.log("token creado",token)
               console.log('Token almacenado en cookies.');
               res.status(200).json({
