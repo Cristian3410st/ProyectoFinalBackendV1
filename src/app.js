@@ -10,8 +10,6 @@ const app = exprees();
 
 app.use(cors({
     origin: ["proyecto-final-frontend-v1.vercel.app", "http://localhost:5173"],
-
-
     credentials:true
 }));      
 
