@@ -9,7 +9,7 @@ import adminRoutes from "./routes/admin.routes.js"
 const app = exprees();
 
 const corsOptions = {
-    origin: 'https://proyectofinalv1frontend.onrender.com',
+    origin: ['https://frontendsubdomain.mgdtbackednv1.online','http://localhost:5173'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   };

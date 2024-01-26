@@ -1,22 +1,20 @@
 import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
 dotenv.config()
-
 const TOKEN_SECRET = process.env.TOKEN_SECRET;
 
 export const accessRequired = (req,res,next) => {
-
   const {token} = req.cookies;
-
-  if(!token)
-  return res.status(401).json({message:"no hay token No autorizado"})
-    
-    jwt.verify(token,TOKEN_SECRET,(err,user)=>{
-        if (err) return res.status(403).json({message:"Token invalido"})
-
-        req.user = user
-    })
-
-
-    next()
+  if(!token){return res.status(401).json({message:"no hay token no esta autorizado"})}
+  else{
+      jwt.verify(token,TOKEN_SECRET,(err,user) =>{
+        if(err){return res.status(403).json({message:"token invalido"})}
+        else{
+         
+          req.user = user
+          next();
+        }
+      })
+  }
+  
 }
