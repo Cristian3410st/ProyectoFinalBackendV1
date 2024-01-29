@@ -1,6 +1,6 @@
 import {Router} from "express"
 import {accessRequired} from "../middlewares/validateToken.js"
-import {getsSchedule,markEntry,markExit,alterPassword,consultarHorarios,modificarHorarios,asignacionHorarios} from "../controllers/admin.controllersUser.js"
+import {getsSchedule,markEntry,markExit,alterPassword,consultarHorarios,modificarHorarios,asignacionHorarios,rest,UserGens} from "../controllers/admin.controllersUser.js"
 
 
 const router = Router();
@@ -14,8 +14,12 @@ router.post('/alterPassword',accessRequired,alterPassword)
 
 router.post('/consultarHorarios',accessRequired,consultarHorarios)
 
-router.post("/modificarHorarios",modificarHorarios)
+router.post("/modificarHorarios",accessRequired,modificarHorarios)
 
-router.post("/asignacionHorarios",asignacionHorarios)
+router.post("/asignacionHorarios",accessRequired,asignacionHorarios)
+
+router.post("/rest",accessRequired,rest)
+
+router.get('/GenUsers',accessRequired,UserGens)
 
 export default router

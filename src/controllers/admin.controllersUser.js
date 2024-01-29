@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs"
 export const getsSchedule = async (req,res) => {
    const id = req.user.username;
    const connection = await getconnection();
-   const find ="SELECT u.username, h.diaSemana, h.horaEntradaAsignada ,h.horaSalidaAsignada,h.horaEntradaRegistrada,h.horaSalidaRegistrada, DATE_FORMAT(h.fecha,'%Y-%m-%d') as fecha FROM usuarios u LEFT JOIN horarios h ON u.username = h.created_by WHERE u.username = ?";
+   const find ="SELECT u.username, h.diaSemana, h.horaEntradaAsignada ,h.horaSalidaAsignada,h.horaEntradaRegistrada,h.horaSalidaRegistrada, DATE_FORMAT(h.fecha,'%Y-%m-%d') as fecha, h.descanso FROM usuarios u LEFT JOIN horarios h ON u.username = h.created_by WHERE u.username = ?";
    
    try{
     const results = await connection.query(find,[id]);
@@ -58,19 +58,19 @@ export const alterPassword = async (req,res)=>{
     const {contraseñaActual,nuevaContraseña} = req.body;
     const connection = await getconnection();
     try{
-        const [user] = await connection.query("SELECT * FROM usuarios WHERE id = ?",[id])
-       if(!user.length>0){return res.status(404).json({message:"Usuario no encontrado"})}
+        const [user] = await connection.query("SELECT * FROM usuarios WHERE username = ?",[id])
+       if(!user.length>0){return res.status(404).json(["no se encontro el usuario"])}
 
         
         
          
           const compare = await bcrypt.compare(contraseñaActual,user[0].password)
-         if(!compare){return res.status(404).json({message:"la contraseña actual es incorrecta"})}
+         if(!compare){return res.status(404).json(["la contraseña actual es incorrecta,valide credenciales ingresadas."])}
          if(nuevaContraseña){
             const nuevaContraseñaHash = await bcrypt.hash(nuevaContraseña,10)
-          await connection.query("UPDATE usuarios SET password = ? WHERE id = ?",[nuevaContraseñaHash,id])
+          await connection.query("UPDATE usuarios SET password = ? WHERE username = ?",[nuevaContraseñaHash,id])
         }
-         res.status(200).json({message:"la constraseña se ha cambiado de forma exitosa"})
+        res.status(200).json(["Cambio de contraseña realizado con éxito. Por favor, cierre sesión y vuelva a ingresar para validar su nueva contraseña"])
 
     }catch(error){
         console.log(error)
@@ -85,7 +85,7 @@ export const alterPassword = async (req,res)=>{
     const {username} = req.body
     console.log(username)
     const connection = await getconnection();
-    const findUser = "SELECT u.username, h.diaSemana, h.horaEntradaAsignada ,h.horaSalidaAsignada,h.horaEntradaRegistrada,h.horaSalidaRegistrada, DATE_FORMAT(h.fecha,'%Y-%m-%d') as fecha FROM usuarios u LEFT JOIN horarios h ON u.username = h.created_by WHERE u.username = ?"
+    const findUser = "SELECT u.username, h.diaSemana, h.horaEntradaAsignada ,h.horaSalidaAsignada,h.horaEntradaRegistrada,h.horaSalidaRegistrada, DATE_FORMAT(h.fecha,'%Y-%m-%d') as fecha, h.descanso FROM usuarios u LEFT JOIN horarios h ON u.username = h.created_by WHERE u.username = ?"
       const result = await connection.query(findUser,[username])
       if(!result.length>0){return res.status(404).json({message:'usuario no econtrado por favor verifique los datos ingresados'})}
       else{
@@ -98,6 +98,8 @@ export const alterPassword = async (req,res)=>{
 
 
  export const modificarHorarios = async(req,res) =>{
+
+  try{
   const {username,diaSemana,horaEntradaAsignada,horaSalidaAsignada,horaEntradaRegistrada,horaSalidaRegistrada,fecha} = req.body;
   const connection = await getconnection();
   const findUser = "SELECT u.username, h.diaSemana, h.horaEntradaAsignada,h.horaSalidaAsignada,h.horaEntradaRegistrada,h.horaSalidaRegistrada, DATE_FORMAT(h.fecha,'%Y-%m-%d') as fecha FROM usuarios u LEFT JOIN horarios h ON u.username = h.created_by WHERE u.username = ?";
@@ -108,10 +110,10 @@ export const alterPassword = async (req,res)=>{
     const modify = await connection.query("UPDATE horarios SET horaEntradaAsignada = ?, horaSalidaAsignada = ?, horaEntradaRegistrada = ?, horaSalidaRegistrada = ? WHERE created_by = ? AND diaSemana = ? AND fecha = ?",
     [horaEntradaAsignada,horaSalidaAsignada,horaEntradaRegistrada,horaSalidaRegistrada,username,diaSemana,fecha]);
      
-
-    
   }
-
+     }catch(error){
+      console.log(error)
+     }  
  }
 
  
@@ -155,7 +157,7 @@ export const alterPassword = async (req,res)=>{
     return  res.status(200).json({message:'Asignación exitosa. Por favor, vuelva a consultar los horarios para ver las modificaciones'});
 
   }else{
-    const diasLaborales = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+    const diasLaborales = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes','sabado','domingo'];
     const fechaInicioDate = new Date(fechaInicio);
     const fechaFinDate = new Date(fechaFin);
     let fechas = [];
@@ -189,4 +191,42 @@ export const alterPassword = async (req,res)=>{
 
 
 
-     
+export const rest =  async (req,res) =>{
+ const {username,diaDescanso,fechaDescanso}  = req.body 
+ console.log(username,diaDescanso,fechaDescanso)
+ const connection = await getconnection()
+const findUser = await connection.query("SELECT * FROM usuarios WHERE username = ?",[username])
+ if(!findUser.length>0){
+return res.status(400).json(["el usuario no se encontro por favor valide credenciales"])
+ }else{
+   const UpdateQuery =`
+     UPDATE horarios
+      SET
+      horaEntradaAsignada = '00:00:00',
+    horaSalidaAsignada = '00:00:00',
+      horaEntradaRegistrada = '00:00:00',
+      horaSalidaRegistrada = '00:00:00',
+      descanso = 'DIA DE DESCANSO'
+      WHERE
+      created_by = ? 
+      AND diaSemana = ? 
+      AND fecha = ?;
+   `;
+
+    const updateResults = await connection.query(UpdateQuery,[username,diaDescanso,fechaDescanso])
+
+    return res.status(200).json(["asignacion de descanso realizada con exito por favor vuelva a validar los horarios para confirmar la asigancion"])
+ }
+}
+
+
+export const UserGens = async(req,res)=>{
+  try{
+  const connection = await getconnection();
+   const [usersGen] =  await connection.query("SELECT username, nombresYapellidos, Edad, correoCorporativo , Cargo ,supervisorEncargado,rol_nombre FROM usuarios")
+
+   res.status(200).json(usersGen)
+  }catch(error){
+    console.log(error)
+  }
+};
