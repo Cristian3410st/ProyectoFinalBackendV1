@@ -17,6 +17,7 @@ const corsOptions = {
 
   app.use(cors(corsOptions))
 
+process.env.TZ = 'America/Bogota';
 
 app.use(morgan("dev"));
 app.use(exprees.json());
