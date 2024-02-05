@@ -41,7 +41,9 @@ export const register = async (req, res) => {
 
      const token = await createAccessToken({username:resUser.username})
       res.cookie("token",token,{
-        secure:true
+        secure:true,
+        domain: "frontendsubdomain.mgdtbackednv1.online",
+
       })
       console.log("token creado",token)
       console.log("token almacenado en la cookies")
@@ -89,7 +91,10 @@ export const login = async (req, res) => {
               };
 
               const token = await createAccessToken({ username:saveUser.username});
-              res.cookie("token",token)
+              res.cookie("token",token,{
+                secure:"true",
+                domain:"frontendsubdomain.mgdtbackednv1.online"
+              })
               console.log("token creado",token)
               console.log('Token almacenado en cookies.');
               console.log(saveUser)
